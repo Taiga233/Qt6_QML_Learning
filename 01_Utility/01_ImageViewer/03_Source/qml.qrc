@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>TopMenu.qml</file>
+        <file>MyMenu.qml</file>
+        <file>MySlider.qml</file>
+        <file>MyGroupBox.qml</file>
+    </qresource>
+    <qresource prefix="/icon">
+        <file>Icon/512.png</file>
+        <file>Icon/icon.ico</file>
+    </qresource>
+</RCC>
