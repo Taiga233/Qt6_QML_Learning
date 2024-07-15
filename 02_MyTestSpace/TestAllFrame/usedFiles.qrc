@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file>Used_Images/Icons/01_WinJumpList_fileIcon.png</file>
+        <file>Used_Images/Icons/02_10-fuel-icon.png</file>
+        <file>Used_Images/Icons/03_10-temperature-icon.png</file>
+        <file>Used_Images/Icons/04_11used_PieMenuControlView_zoomIn.png</file>
+        <file>Used_Images/Icons/05_11used_PieMenuControlView_zoomOut.png</file>
+        <file>Used_Images/Icons/07_11used_PieMenuControlView_back.png</file>
+        <file>Used_Images/Icons/08_11used_PieMenuControlView_settings.png</file>
+        <file>Used_Images/Icons/09_11used_PieMenuControlView_go.png</file>
+        <file>Used_Images/Icons/06_11used_PieMenuControlView_info.png</file>
+        <file>Used_Images/Icons/10_12used_QC1Calendar_Pinned.png</file>
+    </qresource>
+    <qresource prefix="/Pictures">
+        <file>Used_Images/Pictures/01_QML.png</file>
+        <file>Used_Images/GIF/houses_256x175.gif</file>
+        <file>Used_Images/GIF/countryside_512x512.gif</file>
+    </qresource>
+    <qresource prefix="/Documents">
+        <file>Used_Documents/testOpenFile.txt</file>
+    </qresource>
+    <qresource prefix="/StylesPic">
+        <file>Used_Images/Pictures/02_11used_CircularGaugeDarkStyle_background.png</file>
+        <file>Used_Images/Pictures/03_11used_CircularGaugeDarkStyle_needle.png</file>
+        <file>Used_Images/Pictures/04_11used_CircularGaugeDarkStyle_center.png</file>
+        <file>Used_Images/Pictures/05_11used_CircularGaugeLightStyle_background-light.png</file>
+        <file>Used_Images/Pictures/06_11used_CircularGaugeLightStyle_needle-light.png</file>
+        <file>Used_Images/Pictures/07_11used_CircularGaugeLightStyle_center-light.png</file>
+    </qresource>
+    <qresource prefix="/Others">
+        <file>Used_Others/01_11used_OpenSans-Regular.ttf</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,48 @@
+<RCC>
+    <qresource prefix="/main">
+        <file>main.qml</file>
+    </qresource>
+    <qresource prefix="/CustomQmlModels">
+        <file>TestQMLModels/01_CustomJumpList/TestCustomJumpList.qml</file>
+        <file>TestQMLModels/02_ReactanglePropertyAlias/TestRectanglePropertyAlias.qml</file>
+        <file>TestQMLModels/03_PropertyAnimation/TestPropertyAnimationForm.qml</file>
+        <file>TestQMLModels/03_PropertyAnimation/PropertyAnimation/Rect1.qml</file>
+        <file>TestQMLModels/03_PropertyAnimation/PropertyAnimation/Rect2.qml</file>
+        <file>TestQMLModels/03_PropertyAnimation/PropertyAnimation/Rect3.qml</file>
+        <file>TestQMLModels/03_PropertyAnimation/PropertyAnimation/Rect4.qml</file>
+        <file>TestQMLModels/03_PropertyAnimation/TestOtherAnimationForm.qml</file>
+        <file>TestQMLModels/04_Animator/TestAnimatorForm.qml</file>
+        <file>TestQMLModels/05_State_Transition/TestStateAndTransition.qml</file>
+        <file>ItemTestAll.qml</file>
+        <file>TestQMLModels/06_ComplexAnimation/TestParallelSequentialAnimation.qml</file>
+        <file>TestQMLModels/06_ComplexAnimation/SwitchDayAndNight.qml</file>
+        <file>TestQMLModels/07_3D_Rotation/TestGraph3DRotation.qml</file>
+        <file>TestQMLModels/08_GraphEffects/TestGraphEffects.qml</file>
+        <file>TestQMLModels/09_CicularGauge/TestCircularGauge.qml</file>
+        <file>TestQMLModels/10_Dashboard-Official/TestExtrasDashboard.qml</file>
+        <file>TestQMLModels/10_Dashboard-Official/Component/DashboardGaugeStyle.qml</file>
+        <file>TestQMLModels/10_Dashboard-Official/Component/IconGaugeStyle.qml</file>
+        <file>TestQMLModels/10_Dashboard-Official/Component/TachometerStyle.qml</file>
+        <file>TestQMLModels/10_Dashboard-Official/Component/TurnIndicator.qml</file>
+        <file>TestQMLModels/10_Dashboard-Official/Component/ValueSource.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/TestAllExtraGallery.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Viewer/CircularGaugeView.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Viewer/ControlView.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Viewer/ControlViewToolbar.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Viewer/PieMenuControlView.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Customizer/CustomizerLabel.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Customizer/CustomizerSlider.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Customizer/CustomizerSwitch.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Style/BlackButtonBackground.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Style/BlackButtonStyle.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Style/CircularGaugeDarkStyle.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Style/CircularGaugeDefaultStyle.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Style/CircularGaugeLightStyle.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Style/PieMenuDarkStyle.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Style/PieMenuDefaultStyle.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Style/StylePicker.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Viewer/ControlLabel.qml</file>
+        <file>TestQMLModels/11_Gallery-Official/Viewer/FlickableMoreIndicator.qml</file>
+        <file>TestQMLModels/12_Controls1Calendar-Official/TestQC1Calendar.qml</file>
+    </qresource>
+</RCC>

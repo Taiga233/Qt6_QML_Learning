@@ -1,0 +1,10 @@
+QT += sql
+
+SOURCES += \
+    $$PWD/12_Calendar_QMLOfficialExample/event.cpp \
+    $$PWD/12_Calendar_QMLOfficialExample/sqleventmodel.cpp
+
+
+HEADERS += \
+    $$PWD/12_Calendar_QMLOfficialExample/event.h \
+    $$PWD/12_Calendar_QMLOfficialExample/sqleventmodel.h
