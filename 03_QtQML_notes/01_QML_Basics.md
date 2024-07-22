@@ -1440,6 +1440,683 @@ Rectangle {
 |                          |     MenuItem      |                      菜单和菜单栏中的项                      |
 |                          |   MenuSeparator   |                        菜单中的分割条                        |
 
+#### 01 Calendar
+
+![18_QuickControl1Example01Calendar](./01_QML_Basics_Image/18_QuickControl1Example01Calendar.png)
+
+- 本地数据库存储数据
+- SQL语句
+
+
+
+- `event.h`
+
+- ```c++
+  #ifndef EVENT_H
+  #define EVENT_H
+  
+  #include <QDateTime>
+  #include <QObject>
+  #include <QString>
+  
+  class Event : public QObject
+  {
+      Q_OBJECT
+  
+      Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+      Q_PROPERTY(QDateTime startDate READ startDate WRITE setStartDate NOTIFY startDateChanged)
+      Q_PROPERTY(QDateTime endDate READ endDate WRITE setEndDate NOTIFY endDateChanged)
+  public:
+      explicit Event(QObject *parent = 0);
+  
+      QString name() const;
+      void setName(const QString &name);
+  
+      QDateTime startDate() const;
+      void setStartDate(const QDateTime &startDate);
+  
+      QDateTime endDate() const;
+      void setEndDate(const QDateTime &endDate);
+  signals:
+      void nameChanged(const QString &name);
+      void startDateChanged(const QDateTime &startDate);
+      void endDateChanged(const QDateTime &endDate);
+  private:
+      QString mName;
+      QDateTime mStartDate;
+      QDateTime mEndDate;
+  };
+  
+  #endif
+  ```
+
+- `event.cpp`
+
+- ```c++
+  #include "event.h"
+  
+  Event::Event(QObject *parent) :
+      QObject(parent)
+  {
+  }
+  
+  QString Event::name() const
+  {
+      return mName;
+  }
+  
+  void Event::setName(const QString &name)
+  {
+      if (name != mName) {
+          mName = name;
+          emit nameChanged(mName);
+      }
+  }
+  
+  QDateTime Event::startDate() const
+  {
+      return mStartDate;
+  }
+  
+  void Event::setStartDate(const QDateTime &startDate)
+  {
+      if (startDate != mStartDate) {
+          mStartDate = startDate;
+          emit startDateChanged(mStartDate);
+      }
+  }
+  
+  QDateTime Event::endDate() const
+  {
+      return mEndDate;
+  }
+  
+  void Event::setEndDate(const QDateTime &endDate)
+  {
+      if (endDate != mEndDate) {
+          mEndDate = endDate;
+          emit endDateChanged(mEndDate);
+      }
+  }
+  ```
+
+- `sqleventmodel.h`
+
+- ```c++
+  #ifndef SQLEVENTMODEL_H
+  #define SQLEVENTMODEL_H
+  
+  #include <QList>
+  #include <QObject>
+  
+  
+  class SqlEventModel : public QObject
+  {
+      Q_OBJECT
+  
+  public:
+      SqlEventModel();
+  
+      Q_INVOKABLE QList<QObject*> eventsForDate(const QDate &date);
+  
+  private:
+      static void createConnection();
+  };
+  
+  #endif
+  ```
+
+- `sqleventmodel.cpp`
+
+- ```c++
+  #include "sqleventmodel.h"
+  #include "event.h"
+  
+  #include <QDebug>
+  #include <QFileInfo>
+  #include <QSqlError>
+  #include <QSqlQuery>
+  
+  SqlEventModel::SqlEventModel()
+  {
+      createConnection();
+  }
+  
+  QList<QObject*> SqlEventModel::eventsForDate(const QDate &date)
+  {
+      const QString queryStr = QString::fromLatin1("SELECT * FROM Event WHERE '%1' >= startDate AND '%1' <= endDate").arg(date.toString("yyyy-MM-dd"));
+      QSqlQuery query(queryStr);
+      if (!query.exec())
+          qFatal("Query failed");
+  
+      QList<QObject*> events;
+      while (query.next()) {
+          Event *event = new Event(this);
+          event->setName(query.value("name").toString());
+  
+          QDateTime startDate;
+          startDate.setDate(query.value("startDate").toDate());
+          startDate.setTime(QTime(0, 0).addSecs(query.value("startTime").toInt()));
+          event->setStartDate(startDate);
+  
+          QDateTime endDate;
+          endDate.setDate(query.value("endDate").toDate());
+          endDate.setTime(QTime(0, 0).addSecs(query.value("endTime").toInt()));
+          event->setEndDate(endDate);
+  
+          events.append(event);
+      }
+  
+      return events;
+  }
+  
+  /*
+      Defines a helper function to open a connection to an
+      in-memory SQLITE database and to create a test table.
+  */
+  void SqlEventModel::createConnection()
+  {
+      //SQLite version 3 or above
+      //defalut connectionName
+      QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+      db.setDatabaseName(":memory:"); //based on memory
+      if (!db.open()) {
+          qFatal("Cannot open database");
+          return;
+      }
+  
+      QSqlQuery query;
+      // We store the time as seconds because it's easier to query.
+      query.exec("create table Event (name TEXT, startDate DATE, startTime INT, endDate DATE, endTime INT)");
+      query.exec("insert into Event values('Grocery shopping', '2014-01-01', 36000, '2014-01-01', 39600)");
+      query.exec("insert into Event values('Ice skating', '2014-01-01', 57600, '2014-01-01', 61200)");
+      query.exec("insert into Event values('Doctor''s appointment', '2014-01-15', 57600, '2014-01-15', 63000)");
+      query.exec("insert into Event values('Conference', '2014-01-24', 32400, '2014-01-28', 61200)");
+  
+      return;
+  }
+  ```
+
+- `TestQC1Calendar.qml`
+
+- ```js
+  import QtQuick 2.15
+  import QtQuick.Controls 1.4
+  import QtQuick.Controls.Styles 1.4
+  import QtQuick.Controls.Private 1.0
+  
+  import TestClasses.QC1.OfficialExampleCalendar 1.0
+  
+  Rectangle {
+      width: 640
+      height: 400
+      color: "#f4f4f4"
+  
+      SystemPalette {
+          id: systemPalette
+      }
+  
+      SqlEventModel {
+          id: eventModel
+      }
+  
+      Flow {
+          id: row
+          anchors.fill: parent
+          anchors.margins: 20
+          spacing: 10
+          layoutDirection: Qt.RightToLeft
+  
+          Calendar {
+              id: calendar
+              width: (parent.width > parent.height ? parent.width * 0.6 - parent.spacing : parent.width)
+              height: (parent.height > parent.width ? parent.height * 0.6 - parent.spacing : parent.height)
+              frameVisible: true
+              weekNumbersVisible: true
+              selectedDate: new Date(2014, 0, 1)
+              focus: true
+  
+              style: CalendarStyle {
+                  dayDelegate: Item {
+                      readonly property color sameMonthDateTextColor: "#444"
+                      readonly property color selectedDateColor: Qt.platform.os === "osx" ? "#3778d0" : systemPalette.highlight
+                      readonly property color selectedDateTextColor: "white"
+                      readonly property color differentMonthDateTextColor: "#bbb"
+                      readonly property color invalidDatecolor: "#dddddd"
+  
+                      Rectangle {
+                          anchors.fill: parent
+                          border.color: "transparent"
+                          color: styleData.date !== undefined && styleData.selected ? selectedDateColor : "transparent"
+                          anchors.margins: styleData.selected ? -1 : 0
+                      }
+  
+                      Image {
+                          visible: eventModel.eventsForDate(styleData.date).length > 0
+                          anchors.top: parent.top
+                          anchors.left: parent.left
+                          anchors.margins: -1
+                          width: 12
+                          height: width
+                          source: "qrc:/Icons/Used_Images/Icons/10_12used_QC1Calendar_Pinned.png"
+                      }
+  
+                      Label {
+                          id: dayDelegateText
+                          text: styleData.date.getDate()
+                          anchors.centerIn: parent
+                          color: {
+                              var color = invalidDatecolor;
+                              if (styleData.valid) {
+                                  // Date is within the valid range.
+                                  color = styleData.visibleMonth ? sameMonthDateTextColor : differentMonthDateTextColor;
+                                  if (styleData.selected) {
+                                      color = selectedDateTextColor;
+                                  }
+                              }
+                              color;
+                          }
+                      }
+                  }
+              }
+          }
+  
+          Component {
+              id: eventListHeader
+  
+              Row {
+                  id: eventDateRow
+                  width: parent.width
+                  height: eventDayLabel.height
+                  spacing: 10
+  
+                  Label {
+                      id: eventDayLabel
+                      text: calendar.selectedDate.getDate()
+                      font.pointSize: 35
+                  }
+  
+                  Column {
+                      height: eventDayLabel.height
+  
+                      Label {
+                          readonly property var options: { weekday: "long" }
+                          text: Qt.locale().standaloneDayName(calendar.selectedDate.getDay(), Locale.LongFormat)
+                          font.pointSize: 18
+                      }
+                      Label {
+                          text: Qt.locale().standaloneMonthName(calendar.selectedDate.getMonth())
+                                + calendar.selectedDate.toLocaleDateString(Qt.locale(), " yyyy")
+                          font.pointSize: 12
+                      }
+                  }
+              }
+          }
+  
+          Rectangle {
+              width: (parent.width > parent.height ? parent.width * 0.4 - parent.spacing : parent.width)
+              height: (parent.height > parent.width ? parent.height * 0.4 - parent.spacing : parent.height)
+              border.color: Qt.darker(color, 1.2)
+  
+              ListView {
+                  id: eventsListView
+                  spacing: 4
+                  clip: true
+                  header: eventListHeader
+                  anchors.fill: parent
+                  anchors.margins: 10
+                  model: eventModel.eventsForDate(calendar.selectedDate)
+  
+                  delegate: Rectangle {
+                      width: eventsListView.width
+                      height: eventItemColumn.height
+                      anchors.horizontalCenter: parent.horizontalCenter
+  
+                      Image {
+                          anchors.top: parent.top
+                          anchors.topMargin: 4
+                          width: 12
+                          height: width
+                          source: "qrc:/Icons/Used_Images/Icons/10_12used_QC1Calendar_Pinned.png"
+                      }
+  
+                      Rectangle {
+                          width: parent.width
+                          height: 1
+                          color: "#eee"
+                      }
+  
+                      Column {
+                          id: eventItemColumn
+                          anchors.left: parent.left
+                          anchors.leftMargin: 20
+                          anchors.right: parent.right
+                          height: timeLabel.height + nameLabel.height + 8
+  
+                          Label {
+                              id: nameLabel
+                              width: parent.width
+                              wrapMode: Text.Wrap
+                              text: modelData.name
+                          }
+                          Label {
+                              id: timeLabel
+                              width: parent.width
+                              wrapMode: Text.Wrap
+                              text: modelData.startDate.toLocaleTimeString(calendar.locale, Locale.ShortFormat)
+                              color: "#aaa"
+                          }
+                      }
+                  }
+              }
+          }
+      }
+  }
+  ```
+
+
+
+#### 02 File System Browser
+
+**Show:**
+
+- ![19_showCustomFileSystemBrowser](.\01_QML_Basics_Image\19_showCustomFileSystemBrowser.gif)
+
+**Notes:**
+
+- 使用了自定义的继承自`QFileSystemModel`的类，在原有的基础上新加了角色(role)，并且重写了QFileSystemModel中的data函数、及角色和字符串描述对应的哈希表；
+- 使用系统的文件资源管理器打开该文件的链接：`Qt.openUrlExternally(url)`
+- 关于QML的几种注册及属性：
+  - `qmlRegisterType`方式注册：
+    - 优点：
+      1. QML 文件中可以直接使用注册的类型，创建其实例，并与其进行交互。
+      2. 支持类型安全，QML 编辑器（如 Qt Creator）可以提供自动补全和类型检查。
+      3. 适用于需要多个实例的情况，因为 QML 可以直接创建和管理这些实例。
+
+    - 缺点：
+      1. 需要 C++ 类与 QML 之间进行明确的类型匹配。
+      2. 如果类具有复杂的构造函数或需要特定的初始化逻辑，可能需要额外的设置。
+
+  - `qmlRegisterUncreatableType`注册一个C++类型：
+    - 该类型不可实例化，但应可识别为QML类型系统的类型。
+    - 如果类型的枚举或附加属性应该可以从QML访问，但是类型本身不应该是可实例化的，那么这很有用。
+
+  - `setContextProperty()`：将 C++ 对象或值设置为 QML 上下文的属性，这样 QML 文件中就可以通过属性名直接访问它。
+    - 优点：
+      1. 简单直接，适用于将单例或全局对象暴露给 QML。
+      2. 不需要复杂的类型匹配或注册。
+      3. 适用于需要多个实例的情况，因为 QML 可以直接创建和管理这些实例。
+    - 缺点：
+      1. 不支持类型安全，QML 编辑器可能无法提供自动补全或类型检查。
+      2. 只能在 QML 文件中访问一个特定的实例（通常是单例）。
+
+- 关于`Q_ENUM`：
+  - This function is obsolete. It is provided to keep old source code working. We strongly advise against using it in new code.
+  - In new code, you should prefer the use of the Q_ENUM() macro, which makes the type available also to the meta type system.
+
+- If the model is a string list or object list, the delegate is also exposed to a read-only modelData property that holds the string or object data.
+- Note: model, index, and modelData roles are not accessible if the delegate contains required properties, unless it has also required properties with matching names.
+
+**SourceCode:**
+
+- `TestCustomFileSystemBrowser.qml`
+
+- ```js
+  import QtQuick 2.15
+  import QtQuick.Controls 1.5
+  import QtQml.Models 2.15
+  
+  import TestClasses.QC1.OfficialExample.CustomFileSystemModel 1.0
+  
+  Item {
+      width: 640
+      height: 480
+  
+      MenuBar {
+          Menu {
+              title: qsTr("File")
+              MenuItem {
+                  text: qsTr("Exit")
+                  onTriggered: Qt.quit();
+              }
+          }
+      }
+  
+      Row {
+          id: row_ID
+          anchors.top: parent.top
+          anchors.topMargin: 12
+          anchors.horizontalCenter: parent.horizontalCenter
+  
+          ExclusiveGroup {
+              id: eg
+          }
+  
+          Repeater {
+              model: [ "None", "Single", "Extended", "Multi", "Contig."]
+              Button {
+                  //If the model is a string list or object list, the delegate is also exposed to a read-only modelData property that holds the string or object data.
+                  text: modelData
+                  exclusiveGroup: eg
+                  checkable: true
+                  checked: index === 1
+                  onClicked: view.selectionMode = index
+              }
+          }
+      }
+  
+      ItemSelectionModel {
+          id: sel
+          model: customFSysModel
+      }
+  
+      TreeView {
+          id: view
+          anchors.fill: parent
+          anchors.margins: 2 * 12 + row_ID.height
+          model: customFSysModel
+          rootIndex: rootPathIndex
+          selection: sel
+  
+          TableViewColumn {
+              title: "Name"
+              role: "fileName"
+              resizable: true
+          }
+  
+          TableViewColumn {
+              title: "Size"
+              role: "byteSize"
+              resizable: true
+              horizontalAlignment : Text.AlignRight
+              width: 70
+          }
+  
+          TableViewColumn {
+              title: "Permissions"
+              role: "customFilePermissions"
+              resizable: true
+              width: 100
+          }
+  
+          TableViewColumn {
+              title: "Date Modified"
+              role: "lastModified"
+              resizable: true
+          }
+  
+          onActivated : {
+              var url = customFSysModel.data(index, CustomFSysModel.UrlStringRole)
+              //使用系统的文件资源管理器打开该文件的链接
+              Qt.openUrlExternally(url)
+          }
+      }
+  }
+  ```
+
+- `customFileSystemModel.h`
+
+- ```c++
+  #ifndef CUSTOMFILESYSTEMMODEL_H
+  #define CUSTOMFILESYSTEMMODEL_H
+  
+  #include <QFileSystemModel>
+  #include <QObject>
+  
+  class CustomFileSystemModel : public QFileSystemModel
+  {
+      Q_OBJECT
+  public:
+      explicit CustomFileSystemModel(QObject *parent = nullptr);
+  
+      //自定义角色
+      enum Roles  {
+          SizeRole = ((Qt::UserRole + 3 == QFileSystemModel::FilePermissions) ? (Qt::UserRole + 4) : (QFileSystemModel::FilePathRole + 1)), //0x0104
+          CustomFilePermissionsRole,
+          LastModifiedRole,
+          UrlStringRole
+      };
+      //This function is obsolete. It is provided to keep old source code working. We strongly advise against using it in new code.
+      //In new code, you should prefer the use of the Q_ENUM() macro, which makes the type available also to the meta type system.
+      Q_ENUM(Roles)
+  
+      // QAbstractItemModel interface
+  public:
+      //重写QFileSystemModel中的data函数
+      QVariant data(const QModelIndex &index, int role) const override;
+      //重写QAbstractItemModel中的roleNames函数
+      QHash<int, QByteArray> roleNames() const override;
+  };
+  
+  //file permissions:
+  
+  static inline QString permissionString(const QFileInfo &fi)
+  {
+      const QFile::Permissions permissions = fi.permissions();
+      QString result = QLatin1String("----------");
+      if (fi.isSymLink()) {
+          result[0] = QLatin1Char('l');
+      } else if (fi.isDir()) {
+          result[0] = QLatin1Char('d');
+      } else {
+          result[0] = QLatin1Char('-');
+      }
+  
+      if (permissions & QFileDevice::ReadUser)
+          result[1] = QLatin1Char('r');
+      if (permissions & QFileDevice::WriteUser)
+          result[2] = QLatin1Char('w');
+      if (permissions & QFileDevice::ExeUser)
+          result[3] = QLatin1Char('x');
+      if (permissions & QFileDevice::ReadGroup)
+          result[4] = QLatin1Char('r');
+      if (permissions & QFileDevice::WriteGroup)
+          result[5] = QLatin1Char('w');
+      if (permissions & QFileDevice::ExeGroup)
+          result[6] = QLatin1Char('x');
+      if (permissions & QFileDevice::ReadOther)
+          result[7] = QLatin1Char('r');
+      if (permissions & QFileDevice::WriteOther)
+          result[8] = QLatin1Char('w');
+      if (permissions & QFileDevice::ExeOther)
+          result[9] = QLatin1Char('x');
+      return result;
+  }
+  
+  //human readable file size:
+  static inline QString sizeString(const QFileInfo &fi)
+  {
+      if (!fi.isFile())
+          return QString();
+      const qint64 size = fi.size();
+      if (size > static_cast<qint64>(1024) * 1024 * 1024 * 10)
+          return QString::number(size / (1024 * 1024 * 1024)) + QLatin1Char('G');
+      if (size > 1024 * 1024 * 10)
+          return QString::number(size / (1024 * 1024)) + QLatin1Char('M');
+      if (size > 1024 * 10)
+          return QString::number(size / 1024) + QLatin1Char('K');
+      return QString::number(size) + QLatin1Char('B');
+  }
+  
+  #endif // CUSTOMFILESYSTEMMODEL_H
+  ```
+
+- `customFileSystemModel.cpp`
+
+- ```c++
+  #include "customFileSystemModel.h"
+  
+  #include <QLocale>
+  #include <QUrl>
+  #include <QDateTime>
+  
+  CustomFileSystemModel::CustomFileSystemModel(QObject *parent) : QFileSystemModel(parent)
+  {
+  
+  }
+  
+  //重写QFileSystemModel中的data函数
+  QVariant CustomFileSystemModel::data(const QModelIndex &index, int role) const
+  {
+      //自定义数据
+      if (index.isValid() && role >= SizeRole) {
+          switch (role) {
+          case SizeRole:
+              return QVariant(sizeString(fileInfo(index)));
+          case CustomFilePermissionsRole:
+              return QVariant(permissionString(fileInfo(index)));
+          case LastModifiedRole:
+              return QVariant(QLocale::system().toString(fileInfo(index).lastModified(), QLocale::ShortFormat)); //根据本地系统时间的短格式来设定最后修改时间样式
+          case UrlStringRole:
+              return QVariant(QUrl::fromLocalFile(filePath(index)).toString());
+          default:
+              break;
+          }
+      }
+      //原始数据
+      return QFileSystemModel::data(index, role);
+  }
+  
+  //Returns the model's names. //QML Role Name
+  QHash<int, QByteArray> CustomFileSystemModel::roleNames() const
+  {
+      //原有的角色名字
+      QHash<int, QByteArray> result = QFileSystemModel::roleNames();
+      result.insert(SizeRole, QByteArrayLiteral("byteSize"));
+      result.insert(CustomFilePermissionsRole, QByteArrayLiteral("customFilePermissions"));
+      result.insert(LastModifiedRole, QByteArrayLiteral("lastModified"));
+      return result;
+  }
+  ```
+
+
+
+#### 03 Gallery
+
+
+
+#### 04 Styles
+
+
+
+#### 05 Table View
+
+
+
+#### 06 Text Editor
+
+
+
+#### 07 Touch Gallery
+
+
+
+#### 08 UI Forms
+
+
+
+
+
 ### Qt Quick Extras Examples
 
 #### 01 A car dashboard
