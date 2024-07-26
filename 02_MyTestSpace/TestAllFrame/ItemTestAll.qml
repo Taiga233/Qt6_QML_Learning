@@ -13,7 +13,10 @@ import "qrc:/CustomQmlModels/TestQMLModels/08_GraphEffects/"
 import "qrc:/CustomQmlModels/TestQMLModels/09_CicularGauge/"
 import "qrc:/CustomQmlModels/TestQMLModels/10_Dashboard-Official/"
 import "qrc:/CustomQmlModels/TestQMLModels/11_Gallery-Official/"
-import "./TestQMLModels/12_Controls1Calendar-Official"
+
+import "./TestQMLModels/12_Controls1Calendar-Official/"
+import "./TestQMLModels/13_Controls1CustomFileSystemBrowser-Official/"
+import "./TestQMLModels/14_Controls1VariousPlatformGallery-Official"
 
 Item {
     MouseArea {
@@ -140,6 +143,11 @@ Item {
     TestAllExtraGallery { anchors.centerIn: parent }
     */
 
-    //12 测试Quick Controls 1 官方的例子 Calendar
-    TestQC1Calendar { anchors.centerIn: parent }
+    // 测试Quick Controls 1 官方的例子
+    //12 Calendar日历数据库备忘录
+    // TestQC1Calendar { anchors.centerIn: parent }
+    //13 CustomFileSystemBrowser 自定义的文件系统查看器，继承自QFileSystemModel
+    // TestCustomFileSystemBrowser { anchors.centerIn: parent; anchors.fill: parent }
+    //14 VariousPlatformGallery ios/android/osx不同平台的各种控件（OpenGL版本大于3.2）
+    VariousPlatformGallery { Component.onCompleted: show() }
 }

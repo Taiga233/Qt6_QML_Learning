@@ -50,7 +50,7 @@ lessThan(QT_MAJOR_VERSION, 6): HEADERS += \
 
 #The Qt Quick Controls 1 module is deprecated since Qt 5.12
 #test QuickControls 1 Official Example, QML with C++:
-greaterThan(QT_MAJOR_VERSION, 5) | greaterThan(QT_MINOR_VERSION, 12): include(TestClasses/12_TestCalendar_Controls1OfficalExample.pi)
+greaterThan(QT_MAJOR_VERSION, 5) | greaterThan(QT_MINOR_VERSION, 12): include(TestClasses/TestControls1OfficalExample.pi)
 
 #test use "xxx"_L1
 #greaterThan(QT_MAJOR_VERSION, 6): DEFINES += QT_NO_CAST_FROM_ASCII

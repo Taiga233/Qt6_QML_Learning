@@ -2093,11 +2093,419 @@ Rectangle {
 
 #### 03 Gallery
 
+**Show**
 
+![20_QuickControl1Example03Gallery](./01_QML_Basics_Image/20_QuickControl1Example03Gallery.gif)
+
+**Notes**
+
+- `Action`中`text`可以设置默认快捷键，这点和Widget中一样，例如`text:&Copy`绑定默认显示快捷键Alt+C，并不是激活快捷键。
+- `activeFocusItem`：返回一个激活焦点的Item。This attached property holds the item which currently has active focus or null if there is no item with active focus. The Window attached property can be attached to any Item.
+- 如果Windows有复制内容则使能：`enabled: (!!activeFocusItem && !!activeFocusItem["copy"])`
+- 导入JS文件后可使用里面的变量或方法`tabPosition: UI.tabPosition ?? Qt.BottomEdge ?? Qt.TopEdge`
+
+**SourceCode**
+
+- `VariousPlatformGallery.qml`
+
+- ```js
+  import QtQuick 2.15
+  import QtQuick.Layouts 1.15
+  import QtQuick.Dialogs 1.3
+  import QtQuick.Controls 1.5
+  import "./VariousPlatformUIFiles/UI_LocalPlatform.js" as UI
+  import "./Page"
+  
+  ApplicationWindow {
+      visible: true
+      title: "Qt Quick Controls Gallery"
+  
+      width: 640
+      height: 480
+  
+      MessageDialog {
+          id: aboutDialog
+          icon: StandardIcon.Information
+          title: "About"
+          text: "Qt Quick Controls Gallery"
+          informativeText: "This example demonstrates most of the available Qt Quick Controls."
+      }
+  
+      Action {
+          id: copyAction
+          //Note that not all platforms support mnemonics.
+          text: "&Copy" //绑定默认显示快捷键Alt+C
+          shortcut: StandardKey.Copy //标准快捷键
+          iconName: "edit-copy"
+          //This attached property holds the item which currently has active focus or null if there is no item with active focus.
+          //The Window attached property can be attached to any Item.
+          //如果Windows有复制内容则使能
+          enabled: (!!activeFocusItem && !!activeFocusItem["copy"])
+          onTriggered: activeFocusItem.copy()
+      }
+  
+      Action {
+          id: cutAction
+          text: "Cu&t"
+          shortcut: StandardKey.Cut
+          iconName: "edit-cut"
+          enabled: (!!activeFocusItem && !!activeFocusItem["cut"])
+          onTriggered: activeFocusItem.cut()
+      }
+  
+      Action {
+          id: pasteAction
+          text: "&Paste"
+          shortcut: StandardKey.Paste
+          iconName: "edit-paste"
+          enabled: (!!activeFocusItem && !!activeFocusItem["paste"])
+          onTriggered: activeFocusItem.paste()
+      }
+  
+      toolBar: ToolBar {
+          RowLayout {
+              anchors.fill: parent
+              anchors.margins: spacing //The default value is 5.
+              Label {
+                  text: UI.label
+              }
+              Item { Layout.fillWidth: true }
+              CheckBox {
+                  id: enabler
+                  text: "Enabled"
+                  checked: true
+              }
+          }
+      }
+  
+      menuBar: MenuBar {
+          Menu {
+              title: "&File"
+              MenuItem {
+                  text: "E&xit"
+                  shortcut: StandardKey.Quit
+                  onTriggered: Qt.quit()
+              }
+          }
+          Menu {
+              title: "&Edit"
+              visible: tabView.currentIndex == 2
+              MenuItem { action: cutAction }
+              MenuItem { action: copyAction }
+              MenuItem { action: pasteAction }
+          }
+          Menu {
+              title: "&Help"
+              MenuItem {
+                  text: "About..."
+                  onTriggered: aboutDialog.open()
+              }
+          }
+      }
+  
+      TabView {
+          id: tabView
+  
+          anchors.fill: parent
+          anchors.margins: UI.margin
+          //表示tab的位置，在最上面还是在最下面
+          tabPosition: UI.tabPosition ?? Qt.BottomEdge ?? Qt.TopEdge
+  
+          Layout.minimumWidth: 360
+          Layout.minimumHeight: 360
+          Layout.preferredWidth: 480
+          Layout.preferredHeight: 640
+  
+          Tab {
+              title: "Buttons"
+              ButtonPage {
+                  enabled: enabler.checked
+              }
+          }
+          Tab {
+              title: "Progress"
+              ProgressPage {
+                  enabled: enabler.checked
+              }
+          }
+          Tab {
+              title: "Input"
+              InputPage {
+                  enabled: enabler.checked
+              }
+          }
+      }
+  }
+  ```
+
+- `UI_LocalPlatform.js`
+
+- ```js
+  .pragma library
+  
+  var margin = 2
+  var tabPosition = Qt.TopEdge
+  var label = "VariousPlatformGallery"
+  ```
+
+- `ButtonPage.qml`
+
+- ```js
+  import QtQuick 2.15
+  import QtQuick.Layouts 1.15
+  import QtQuick.Controls 1.5
+  
+  ScrollView {
+      id: page
+      implicitWidth: 640
+      implicitHeight: 200
+  
+      //关闭水平滚动条
+      horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+  
+      Item {
+          id: content
+  
+          width: Math.max(page.viewport.width, grid.implicitWidth + 2 * grid.rowSpacing)
+          height: Math.max(page.viewport.height, grid.implicitHeight + 2 * grid.columnSpacing)
+  
+          GridLayout {
+              id: grid
+  
+              anchors.top: parent.top
+              anchors.left: parent.left
+              anchors.right: parent.right
+              anchors.leftMargin: grid.rowSpacing
+              anchors.rightMargin: grid.rowSpacing
+              anchors.topMargin: grid.columnSpacing
+  
+              //页面宽小于页面高，不是主程序窗口
+              columns: page.width < page.height ? 1 : 2
+  
+              GroupBox {
+                  title: "Button"
+                  Layout.fillWidth: true
+                  Layout.columnSpan: grid.columns //横跨整个行
+                  RowLayout {
+                      anchors.fill: parent
+                      Button { text: "OK"; isDefault: true }
+                      Button { text: "Cancel" }
+                      Item { Layout.fillWidth: true }
+                      //下拉式按钮
+                      Button {
+                          text: "Attach"
+                          menu: Menu {
+                              MenuItem { text: "Image" }
+                              MenuItem { text: "Document" }
+                          }
+                      }
+                  }
+              }
+  
+              GroupBox {
+                  title: "CheckBox"
+                  Layout.fillWidth: true
+                  ColumnLayout {
+                      anchors.fill: parent
+                      CheckBox { text: "E-mail"; checked: true }
+                      CheckBox { text: "Calendar"; checked: true }
+                      CheckBox { text: "Contacts" }
+                  }
+              }
+  
+              GroupBox {
+                  title: "RadioButton"
+                  Layout.fillWidth: true
+                  ColumnLayout {
+                      anchors.fill: parent
+                      ExclusiveGroup { id: radioGroup }
+                      RadioButton { text: "Portrait"; exclusiveGroup: radioGroup }
+                      RadioButton { text: "Landscape"; exclusiveGroup: radioGroup }
+                      RadioButton { text: "Automatic"; exclusiveGroup: radioGroup; checked: true }
+                  }
+              }
+  
+              GroupBox {
+                  title: "Switch"
+                  Layout.fillWidth: true
+                  Layout.columnSpan: grid.columns
+                  ColumnLayout {
+                      anchors.fill: parent
+                      RowLayout {
+                          Label { text: "Wi-Fi"; Layout.fillWidth: true }
+                          Switch { checked: true }
+                      }
+                      RowLayout {
+                          Label { text: "Bluetooth"; Layout.fillWidth: true }
+                          Switch { checked: false }
+                      }
+                  }
+              }
+          }
+      }
+  }
+  ```
+
+- `InputPage.qml`
+
+- ```js
+  import QtQuick 2.15
+  import QtQuick.Layouts 1.15
+  import QtQuick.Controls 1.5
+  
+  ScrollView {
+      id: page
+      implicitWidth: 640
+      implicitHeight: 400
+  
+      horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+  
+      Item {
+          id: content
+  
+          width: Math.max(page.viewport.width, column.implicitWidth + 2 * column.spacing)
+          height: Math.max(page.viewport.height, column.implicitHeight + 2 * column.spacing)
+  
+          //通过Item包一层
+          ColumnLayout {
+              id: column
+  
+              anchors.top: parent.top
+              anchors.left: parent.left
+              anchors.right: parent.right
+              anchors.margins: column.spacing
+  
+              GroupBox {
+                  title: "TextField"
+                  Layout.fillWidth: true
+                  ColumnLayout {
+                      anchors.fill: parent
+                      TextField { placeholderText: "..."; Layout.fillWidth: true; z: 1 }
+                      TextField { placeholderText: "Password"; echoMode: TextInput.PasswordEchoOnEdit; Layout.fillWidth: true } //同时不允许复制
+                  }
+              }
+  
+              GroupBox {
+                  title: "ComboBox"
+                  Layout.fillWidth: true
+                  ColumnLayout {
+                      anchors.fill: parent
+                      ComboBox {
+                          model: Qt.fontFamilies()
+                          Layout.fillWidth: true
+                      }
+                      ComboBox {
+                          editable: true
+                          model: ListModel {
+                              id: listModel
+                              ListElement { text: "Apple" }
+                              ListElement { text: "Banana" }
+                              ListElement { text: "Coconut" }
+                              ListElement { text: "Orange" }
+                          }
+                          onAccepted: {
+                              //ComboBox的Method
+                              if (find(currentText) === -1) {
+                                  listModel.append({text: editText})
+                                  currentIndex = find(editText)
+                              }
+                          }
+                          Layout.fillWidth: true
+                      }
+                  }
+              }
+  
+              GroupBox {
+                  title: "SpinBox"
+                  Layout.fillWidth: true
+                  ColumnLayout {
+                      anchors.fill: parent
+                      SpinBox { value: 99; Layout.fillWidth: true; z: 1 }
+                      SpinBox { decimals: 2; Layout.fillWidth: true }
+                  }
+              }
+          }
+      }
+  }
+  ```
+
+- `ProgressPage.qml`
+
+- ```js
+  import QtQuick 2.15
+  import QtQuick.Layouts 1.15
+  import QtQuick.Controls 1.5
+  
+  ScrollView {
+      id: page
+      implicitWidth: 640
+      implicitHeight: 400
+  
+      horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+  
+      Item {
+          id: content
+  
+          width: Math.max(page.viewport.width, column.implicitWidth + 2 * column.spacing)
+          height: Math.max(page.viewport.height, column.implicitHeight + 2 * column.spacing)
+  
+          ColumnLayout {
+              id: column
+  
+              anchors.top: parent.top
+              anchors.left: parent.left
+              anchors.right: parent.right
+              anchors.margins: column.spacing
+  
+              GroupBox {
+                  title: "ProgressBar"
+                  Layout.fillWidth: true
+                  ColumnLayout {
+                      anchors.fill: parent
+                      ProgressBar { indeterminate: true; Layout.fillWidth: true }
+                      ProgressBar { value: slider.value; Layout.fillWidth: true }
+                  }
+              }
+  
+              GroupBox {
+                  title: "Slider"
+                  Layout.fillWidth: true
+                  ColumnLayout {
+                      anchors.fill: parent
+                      Slider { id: slider; value: 0.5; Layout.fillWidth: true }
+                  }
+              }
+  
+              GroupBox {
+                  title: "BusyIndicator"
+                  Layout.fillWidth: true
+                  BusyIndicator { running: true }
+              }
+          }
+      }
+  }
+  ```
 
 #### 04 Styles
 
+**Show**
 
+**Notes**
+
+- 通过`BorderImage`来创建图片边界样式，BorderImage类型用于通过缩放或平铺每个图像的部分来从图像中创建边界，然后设定样式背景或其他组件。
+- `ParticleSystem`，粒子特效系统，包含`painter`（绘制器），`emitter`（发射器），`affector`（影响因子）；
+- `ImageParticle`，用于使用图像可视化逻辑粒子，基本单元（粒子）为图像，此元素将逻辑粒子渲染为图像。有四种逻辑，粒子可隐式共享。从Qt5.2开始，默认有三种基本例子:
+  - `qrc:///particleresources/star.png`
+  - `qrc:///particleresources/glowdot.png`
+  - `qrc:///particleresources/fuzzydot.png`
+- `Emitter`，发射器，用于将特效发射给`ParticleSystem`。给定的起始属性可以在粒子生命周期的任何时候被同一粒子系统中的任何 Affector 元素修改。
+  - `size`可设置粒子开始发射时的像素尺寸，默认16px。
+  - `sizeVariation`可以设置粒子变化的像素大小范围。
+- Controls 1 中每一个`XxxStyle`都有一个`styleData`属性，通过该属性可访问一些只读的组件状态信息；
+
+**Source Code**
+
+- 
 
 #### 05 Table View
 

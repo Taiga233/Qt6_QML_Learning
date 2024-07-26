@@ -1,0 +1,15 @@
+QT += sql
+
+INCLUDEPATH += $$PWD/TestControls1-OfficalExample/12_Calendar_QMLOfficialExample
+INCLUDEPATH += $$PWD/TestControls1-OfficalExample/13_CustomFileSystemBrowser
+
+SOURCES += \
+    $$PWD/TestControls1-OfficalExample/12_Calendar_QMLOfficialExample/event.cpp \
+    $$PWD/TestControls1-OfficalExample/12_Calendar_QMLOfficialExample/sqleventmodel.cpp \
+    $$PWD/TestControls1-OfficalExample/13_CustomFileSystemBrowser/customFileSystemModel.cpp
+
+
+HEADERS += \
+    $$PWD/TestControls1-OfficalExample/12_Calendar_QMLOfficialExample/event.h \
+    $$PWD/TestControls1-OfficalExample/12_Calendar_QMLOfficialExample/sqleventmodel.h \
+    $$PWD/TestControls1-OfficalExample/13_CustomFileSystemBrowser/customFileSystemModel.h

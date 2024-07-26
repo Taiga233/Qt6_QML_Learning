@@ -3,7 +3,7 @@ import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Controls.Private 1.0
 
-import TestClasses.QC1.OfficialExampleCalendar 1.0
+import TestClasses.QC1.OfficialExample.Calendar 1.0
 
 Rectangle {
     width: 640

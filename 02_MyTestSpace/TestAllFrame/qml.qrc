@@ -44,5 +44,14 @@
         <file>TestQMLModels/11_Gallery-Official/Viewer/ControlLabel.qml</file>
         <file>TestQMLModels/11_Gallery-Official/Viewer/FlickableMoreIndicator.qml</file>
         <file>TestQMLModels/12_Controls1Calendar-Official/TestQC1Calendar.qml</file>
+        <file>TestQMLModels/13_Controls1CustomFileSystemBrowser-Official/TestCustomFileSystemBrowser.qml</file>
+        <file>TestQMLModels/14_Controls1VariousPlatformGallery-Official/VariousPlatformGallery.qml</file>
+        <file>TestQMLModels/14_Controls1VariousPlatformGallery-Official/VariousPlatformUIFiles/UI_LocalPlatform.js</file>
+        <file>TestQMLModels/14_Controls1VariousPlatformGallery-Official/VariousPlatformUIFiles/+android/UI.js</file>
+        <file>TestQMLModels/14_Controls1VariousPlatformGallery-Official/VariousPlatformUIFiles/+ios/UI.js</file>
+        <file>TestQMLModels/14_Controls1VariousPlatformGallery-Official/VariousPlatformUIFiles/+osx/UI.js</file>
+        <file>TestQMLModels/14_Controls1VariousPlatformGallery-Official/Page/ButtonPage.qml</file>
+        <file>TestQMLModels/14_Controls1VariousPlatformGallery-Official/Page/InputPage.qml</file>
+        <file>TestQMLModels/14_Controls1VariousPlatformGallery-Official/Page/ProgressPage.qml</file>
     </qresource>
 </RCC>
